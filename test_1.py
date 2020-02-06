@@ -2,16 +2,13 @@
 """
 Scale and find surface area
 """
-import pySwc
+import pySWC
 
-test_cell = pySwc.Swc('test_file.swc')
+in_file = pySWC.Swc('test_file.swc')
 
-print(test_cell.surface_area)
+in_file.scale(0.1)
+in_file.rotate(180, 0, 0)
 
-test_cell.scale(0.5)
-
-print(test_cell.surface_area)
-
-test_cell.adjust_surface_area(5000, error_rate = 0.00001)
-
-print(test_cell.surface_area)
+in_file.adjust_surface_area(4000)
+print(in_file.surface_area)
+in_file.save_file("test_scaled.swc")
