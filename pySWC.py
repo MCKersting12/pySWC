@@ -19,7 +19,7 @@ class Swc:
         
         self.data = np.genfromtxt(filename)
         self.num_nodes = self.data.shape[0]
-        self.surface_area =  self.find_surface_area()
+        self.surface_area = self.find_surface_area()
         
     def save_file(self, filename):
         
@@ -42,16 +42,30 @@ class Swc:
             self.data[node, x] = self.data[node, x] * scale_factor
             self.data[node, y] = self.data[node, y] * scale_factor
             self.data[node, z] = self.data[node, z] * scale_factor
-            if scale_radii == True:
+            if scale_radii:
                 self.data[node, radius] = self.data[node, radius] * scale_factor
             
         self.surface_area =  self.find_surface_area()
+
+    def anisotropic_scale(self, x_scale, y_scale, z_scale, scale_radii=False):
+
+        x, y, z, radius = self.node_x, self.node_y, self.node_z, self.node_radius
+
+        for node in range(0, self.num_nodes):
+
+            self.data[node, x] = self.data[node, x] * x_scale
+            self.data[node, y] = self.data[node, y] * y_scale
+            self.data[node, z] = self.data[node, z] * z_scale
+            if scale_radii:
+                self.data[node, radius] = self.data[node, radius] * ((x_scale + y_scale + z_scale) / 3)
+
+        self.surface_area = self.find_surface_area()
         
     def translate(self, x_translation, y_translation, z_translation):
         
         x, y, z = self.node_x, self.node_y, self.node_z
         
-        for node in range(0,self.num_nodes):
+        for node in range(0, self.num_nodes):
             
             self.data[node, x] = self.data[node, x] + x_translation
             self.data[node, y] = self.data[node, y] + y_translation
@@ -83,7 +97,7 @@ class Swc:
         """
         radius = self.node_radius
         
-        while((np.abs(self.surface_area - goal_surface_area)/goal_surface_area) > error_rate ):
+        while np.abs(self.surface_area - goal_surface_area)/goal_surface_area > error_rate:
             new_swc = self.data
             scaling_factor = goal_surface_area / self.surface_area
             for node in range(0, self.num_nodes):
@@ -116,4 +130,37 @@ class Swc:
             self.data[node,x] = self.data[node,x] * math.cos(z_rotation) - self.data[node,y] * math.sin(z_rotation)
             self.data[node,y] = self.data[node,x] * math.sin(z_rotation) + self.data[node,y] * math.cos(z_rotation)
             self.data[node,z] = self.data[node,z]
-    
+
+    def find_children(self, node):
+
+        number, parent = self.node_number, self.node_parent
+        children = []
+
+        for other_node in range(0,self.num_nodes):
+
+            if self.data[other_node, parent] == self.data[node, number]:
+                children.append(other_node)
+
+        return(children)
+
+"""
+    def halve_num_nodes(self):
+
+        number, parent = self.node_number, self.node_parent
+        delete = 0
+        for node in range(0, self.num_nodes):
+            children = self.find_children(node)
+            if len(children) == 1 and delete == 0:
+
+                current_parent = self.data[node, parent]
+                self.data[children[0], parent] = current_parent
+                del self.data[node, :]
+
+                for rem_node in range(node, self.num_nodes):
+                    self.data[rem_node, number] -= 1
+                    self.data[rem_node, parent] -= 1
+
+                delete += 1
+
+            delete = delete % 2
+"""
