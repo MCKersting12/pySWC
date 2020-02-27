@@ -8,10 +8,12 @@ def main(input_swc):
     in_file = pySWC.Swc(input_swc)
     radius = in_file.node_radius
     label = in_file.node_label
-    swelling_label = 18
+    swelling_label = 6
+    ratio = 1.5
+    replaced_label = 14
 
     for node in range(0, in_file.num_nodes):
-        if in_file.data[node, label] == 14:
+        if in_file.data[node, label] == replaced_label:
             old_branch = []
             branch = find_branch(in_file, node, 0, old_branch)
             smallest_1 = 999
@@ -25,7 +27,7 @@ def main(input_swc):
                 for current_node in branch:
 
                     """
-                    We are grabbing swellings!! It seems to grab too many nodes around the swelling and It overwrites hubs.
+                    We are grabbing swellings!! It seems to grab too many nodes around the swelling
                     """
                     #code.interact(local=locals())
 
@@ -41,16 +43,15 @@ def main(input_swc):
                         smallest_2 = in_file.data[current_node, radius]
                         smallest_index_2 = current_node
 
-            print(str(smallest_1) + " " + str(largest) + " " + str(smallest_2))
             if smallest_index_1 < largest_index < smallest_index_2:
-                if largest / smallest_1 > 1.5:
-                    if largest / smallest_2 > 1.5:
+                if largest / smallest_1 > ratio:
+                    if largest / smallest_2 > ratio:
                         for swelling_node in range(smallest_index_1+1, smallest_index_2):
                             in_file.data[swelling_node, label] = swelling_label
 
             if smallest_index_2 < largest_index < smallest_index_1:
-                if largest / smallest_1 > 1.5:
-                    if largest / smallest_2 > 1.5:
+                if largest / smallest_1 > ratio:
+                    if largest / smallest_2 > ratio:
                         for swelling_node in range(smallest_index_2+1, smallest_index_1):
                             in_file.data[swelling_node, label] = swelling_label
 
