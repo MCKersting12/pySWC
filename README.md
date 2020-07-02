@@ -1,7 +1,7 @@
 # pySWC
 Functions used for the manipulation of swc files
 
-Swc files are commonly used to represent neurons. They are good for morphological analysis and can be used for biophysically realistic computational models
+Swc files are commonly used to represent neurons. They can be used for morphological analysis and to create biophysically realistic computational models. This Python class can be used for processing the file. The test file shows how to implement the class.
 
 Only dependency is numpy
 
