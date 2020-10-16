@@ -85,22 +85,29 @@ class Swc:
         x, y, z, radius = (self.node_x, self.node_y,
                            self.node_z, self.node_radius)
 
+        if self.data.ndim == 1:
+            return 0.0
+
         total_area = 0.0
         for node in range(0, self.num_nodes-1):
-            x_dist = np.abs(self.data[node, x] - self.data[node+1, x])
-            y_dist = np.abs(self.data[node, y] - self.data[node+1, y])
-            z_dist = np.abs(self.data[node, z] - self.data[node+1, z])
-            total_dist = np.sqrt(x_dist**2 + y_dist**2 + z_dist**2)
 
-            r_1 = self.data[node, radius]
-            r_2 = self.data[node+1, radius]
-            factor_1 = np.pi * (r_1 + r_2)
-            factor_2 = np.sqrt(total_dist**2 + (r_2 - r_1)**2)
-            
-            section_area = factor_1 * factor_2
-            total_area += section_area
+            children = self.find_children(node)
+            for child in children:
 
-        return(total_area)
+                x_dist = np.abs(self.data[node, x] - self.data[child, x])
+                y_dist = np.abs(self.data[node, y] - self.data[child, y])
+                z_dist = np.abs(self.data[node, z] - self.data[child, z])
+                total_dist = np.sqrt(x_dist**2 + y_dist**2 + z_dist**2)
+
+                r_1 = self.data[node, radius]
+                r_2 = self.data[child, radius]
+                factor_1 = np.pi * (r_1 + r_2)
+                factor_2 = np.sqrt(total_dist**2 + (r_2 - r_1)**2)
+
+                section_area = factor_1 * factor_2
+                total_area += section_area
+
+        return total_area
 
     def adjust_surface_area(self, goal_surface_area, error_rate=0.001):
         """
@@ -122,6 +129,7 @@ class Swc:
                 
             self.data = new_swc
             self.surface_area = self.find_surface_area()
+
 
     def rotate(self, x_rotation_deg, y_rotation_deg, z_rotation_deg):
         import math

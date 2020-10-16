@@ -1,5 +1,6 @@
 import pyswc
 import os
+import numpy as np
 
 
 def isolate_type(swc, isolated_labels):
@@ -22,7 +23,9 @@ def isolate_type(swc, isolated_labels):
             isolated_nodes.append(swc.data[node, :])
 
     if len(isolated_nodes) == 0:
-        raise ValueError('There are no nodes of type ' + str(isolated_labels))
+        #print('There are no nodes of type ' + str(isolated_labels))
+        return 0
+
     old_id = []
     new_id = []
 
@@ -47,7 +50,9 @@ def isolate_type(swc, isolated_labels):
     f = open(new_file, "w")
 
     new_swc = pyswc.Swc(new_file)
-    new_swc.data = isolated_nodes
+    new_swc.data = np.asarray(isolated_nodes)
+    new_swc.num_nodes = new_swc.data.shape[0]
+    new_swc.surface_area = new_swc.find_surface_area()
     f.close()
     os.remove(new_file)
     
